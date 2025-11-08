@@ -1,0 +1,56 @@
+# ---- VCS / meta ----
+.git
+.github
+.gitignore
+.DS_Store
+Thumbs.db
+
+# ---- Top-level env/secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Client (Vite/React/Node) ----
+client/node_modules
+client/.next
+client/.parcel-cache
+client/.cache
+client/.tmp
+client/tmp
+client/dist
+client/build
+client/npm-debug.log*
+client/yarn-error.log*
+client/pnpm-debug.log*
+
+# ---- Server (Python/Flask) ----
+server/__pycache__/
+server/**/*.py[cod]
+server/.pytest_cache/
+server/.mypy_cache/
+server/.coverage
+server/.coverage.*
+server/htmlcov/
+server/coverage/
+server/venv/
+server/.venv/
+server/build/
+server/dist/
+server/*.egg-info
+
+# Keep the example env if you add one:
+# !server/.env.example
+
+# Avoid sending server secrets (compose will read this at runtime, not build-time)
+server/.env
+
+# ---- Logs / misc ----
+*.log
+coverage
+*.sqlite*
+*.db
+
+# ---- Docker files (do NOT ignore the Dockerfiles you use) ----
+# If you ever globally ignore Dockerfiles, make sure to keep these:
+!deploy/Dockerfile.api
+!deploy/Dockerfile.client
