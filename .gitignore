@@ -1,0 +1,46 @@
+# ---- OS / Editor junk ----
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# ---- Python (server) ----
+server/__pycache__/
+server/**/*.pyc
+server/.pytest_cache/
+server/.mypy_cache/
+server/.coverage
+server/coverage.xml
+server/dist/
+server/build/
+server/wheels/
+server/venv/
+server/env/
+server/.env
+server/.env.*    # e.g. .env.local
+
+# ---- Node/React (client) ----
+client/node_modules/
+client/.parcel-cache/
+client/.next/
+client/out/
+client/dist/
+client/build/
+client/.env
+client/.env.*    # e.g. .env.local
+
+# ---- Logs / coverage (frontend) ----
+client/npm-debug.log*
+client/yarn-error.log*
+client/pnpm-debug.log*
+client/coverage/
+
+# ---- Misc ----
+*.sqlite3
+*.db
+.env
+.env.*
