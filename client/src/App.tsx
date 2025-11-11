@@ -1,6 +1,7 @@
 import { Link, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { logout } from "./api/auth";
+import Chatbot from "./components/Chatbot";
 
 type User = { email: string; username?: string };
 
@@ -42,6 +43,7 @@ export default function App() {
         </div>
       </header>
       <Outlet />
+      <Chatbot />
     </div>
   );
 }
