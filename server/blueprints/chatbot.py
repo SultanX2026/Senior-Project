@@ -2,7 +2,10 @@ from flask import Blueprint, request, jsonify
 from services.ollama_client import generate_with_ollama
 from services.llm_fallback import generate_with_openai
 from core.db import threads, comments
+from core.config import Config
+import logging
 
+logger = logging.getLogger(__name__)
 chatbot_bp = Blueprint("chatbot", __name__, url_prefix="/api/chatbot")
 
 
@@ -38,6 +41,18 @@ def _get_community_context(symbol: str) -> str:
     return context
 
 
+@chatbot_bp.get("/debug")
+def debug_config():
+    """Debug endpoint to check if config is loaded correctly."""
+    return jsonify({
+        "openai_api_key_set": bool(Config.OPENAI_API_KEY),
+        "openai_api_key_length": len(Config.OPENAI_API_KEY) if Config.OPENAI_API_KEY else 0,
+        "openai_api_key_preview": (Config.OPENAI_API_KEY[:20] + "...") if Config.OPENAI_API_KEY else "NOT SET",
+        "openai_model": Config.OPENAI_MODEL,
+        "ollama_host": Config.OLLAMA_HOST,
+    })
+
+
 @chatbot_bp.post("/ask")
 def ask_chatbot():
     """Answer questions about stocks and community sentiment."""
@@ -65,10 +80,32 @@ def ask_chatbot():
     # Generate response
     prompt = f"{context}\n\nUser question: {question}\n\nProvide a concise answer (2-3 sentences max). Do not give financial advice."
     
-    answer = generate_with_ollama(prompt) or generate_with_openai(prompt) or "I couldn't generate a response. Try again."
+    # Try Ollama first (free, local), then fall back to OpenAI
+    logger.info(f"Trying to generate response for question: {question}")
     
+    answer = generate_with_ollama(prompt)
+    if answer:
+        logger.info("✓ Ollama response generated")
+        return jsonify({
+            "question": question,
+            "answer": answer,
+            "symbols_mentioned": symbols
+        })
+    
+    logger.warning("⚠ Ollama failed, trying OpenAI...")
+    answer = generate_with_openai(prompt)
+    if answer:
+        logger.info("✓ OpenAI response generated")
+        return jsonify({
+            "question": question,
+            "answer": answer,
+            "symbols_mentioned": symbols
+        })
+    
+    logger.error("✗ Both Ollama and OpenAI failed!")
     return jsonify({
         "question": question,
-        "answer": answer,
-        "symbols_mentioned": symbols
+        "answer": "I couldn't generate a response. Try again.",
+        "symbols_mentioned": symbols,
+        "error": "Both Ollama and OpenAI services failed"
     })
