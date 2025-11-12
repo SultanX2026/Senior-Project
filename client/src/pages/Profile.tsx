@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { updateProfile, User } from "../api/auth";
 import { Link } from "react-router-dom";
+import styles from "./Profile.module.css";
 
 const DEFAULT_COLORS = ["#6E85B7","#A3E635","#22D3EE","#F97316","#F43F5E","#10B981","#818CF8","#F59E0B"];
 
@@ -42,10 +43,12 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div>
-        <h1>Profile</h1>
-        <p>You’re not logged in.</p>
-        <Link to="/auth">Go to Login</Link>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h1 className={styles.title}>Profile</h1>
+          <p className={styles.notLoggedIn}>You're not logged in.</p>
+          <Link to="/auth" className={styles.link}>Go to Login →</Link>
+        </div>
       </div>
     );
   }
@@ -68,68 +71,73 @@ export default function Profile() {
   };
 
   return (
-    <div>
-      <h1>Profile</h1>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-        <div
-          title="Click to change color"
-          onClick={() => setAvatarColor(randomColor(avatarColor))}
-          style={{
-            width: 56, height: 56, borderRadius: "50%",
-            background: avatarColor, color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 700, fontSize: 20, cursor: "pointer", userSelect: "none",
-            boxShadow: "0 1px 4px rgba(0,0,0,.15)",
-          }}
-        >
-          {initials}
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>👤 Profile</h1>
+          <p className={styles.subtitle}>{user.email}</p>
         </div>
-        <input
-          aria-label="Avatar color"
-          type="color"
-          value={avatarColor}
-          onChange={(e) => setAvatarColor(e.target.value)}
-          style={{ width: 40, height: 40, padding: 0, border: "none", background: "transparent", cursor: "pointer" }}
-        />
-      </div>
 
-      <div style={{ display: "grid", gap: 8, maxWidth: 420 }}>
-        <label>
-          <div>Email</div>
-          <input value={user.email} disabled />
-        </label>
-
-        <label>
-          <div>Username</div>
+        <div className={styles.avatarSection}>
+          <div
+            className={styles.avatar}
+            title="Click to change color"
+            onClick={() => setAvatarColor(randomColor(avatarColor))}
+            style={{ background: avatarColor }}
+          >
+            {initials}
+          </div>
           <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="username"
+            aria-label="Avatar color"
+            type="color"
+            value={avatarColor}
+            onChange={(e) => setAvatarColor(e.target.value)}
+            className={styles.colorPicker}
           />
-        </label>
+        </div>
 
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {DEFAULT_COLORS.map(c => (
-            <button
-              key={c}
-              onClick={() => setAvatarColor(c)}
-              style={{
-                width: 28, height: 28, borderRadius: "50%",
-                border: c === avatarColor ? "2px solid #111" : "2px solid #fff",
-                outline: "1px solid #ddd",
-                background: c, cursor: "pointer"
-              }}
-              title={c}
+        <div className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Email</label>
+            <input className={styles.input} value={user.email} disabled />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Username</label>
+            <input
+              className={styles.input}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
             />
-          ))}
+          </div>
+
+          <div className={styles.colorGrid}>
+            <div className={styles.colorLabel}>Choose Avatar Color</div>
+            <div className={styles.colors}>
+              {DEFAULT_COLORS.map((c) => (
+                <button
+                  key={c}
+                  className={`${styles.colorBtn} ${c === avatarColor ? styles.active : ""}`}
+                  style={{ background: c }}
+                  onClick={() => setAvatarColor(c)}
+                  title={c}
+                />
+              ))}
+            </div>
+          </div>
+
+          <button className={styles.saveBtn} onClick={save}>
+            Save Changes
+          </button>
         </div>
 
-        <div>
-          <button onClick={save}>Save</button>
-        </div>
+        {msg && (
+          <div className={`${styles.message} ${msg.includes("Saved") ? styles.success : styles.error}`}>
+            {msg}
+          </div>
+        )}
       </div>
-      {msg && <div style={{ marginTop: 8 }}>{msg}</div>}
     </div>
   );
 }

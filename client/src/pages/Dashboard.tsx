@@ -5,6 +5,7 @@ import { getQuote, getCandles, getProfile } from "../api/stocks";
 import { communitySentiment } from "../api/community";
 import { searchSymbols } from "../api/stocks";
 import Spark from "../components/Spark";
+import styles from "./Dashboard.module.css";
 
 const DEFAULTS = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "NFLX"];
 const LS_KEY = "stocklens_custom_universe";
@@ -145,104 +146,72 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
-      {/* Title + search (unchanged) */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-        <h1 style={{ margin: 0 }}>StockLens</h1>
-        <form onSubmit={onSubmit} style={{ display: "flex", gap: 8 }}>
+    <div className={styles.container}>
+      {/* Header */}
+      <div className={styles.header}>
+        <h1 className={styles.title}>📊 Stock Dashboard</h1>
+        <form onSubmit={onSubmit} className={styles.searchForm}>
           <input
-            style={{ width: 300, padding: "6px 8px" }}
+            className={styles.searchInput}
             placeholder="Search: Apple or AAPL…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button type="submit">Search</button>
+          <button type="submit" className={styles.searchBtn}>Search</button>
         </form>
-        <div style={{ marginLeft: "auto" }}>
-          {visible < universe.length && (
-            <button onClick={() => setVisible((v) => Math.min(universe.length, v + CHUNK))}>
-              Load more
-            </button>
-          )}
-        </div>
+        {visible < universe.length && (
+          <button className={styles.loadMoreBtn} onClick={() => setVisible((v) => Math.min(universe.length, v + CHUNK))}>
+            Load More
+          </button>
+        )}
       </div>
 
-      {/* Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(460px, 1fr))",
-          gap: 24,
-        }}
-      >
+      {/* Stock Grid */}
+      <div className={styles.stockGrid}>
         {rows.slice(0, visible).map((r) => {
           const price = r.price !== undefined ? r.price : "—";
-          const chg = r.changePct !== undefined ? `${r.changePct.toFixed(2)}%` : "—";
+          const chg = r.changePct !== undefined ? r.changePct : 0;
+          const isPositive = chg >= 0;
           const scorePct = ((r.communityScore ?? 0) * 100).toFixed(0);
 
           return (
-            <div
-              key={r.symbol}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 12,
-                padding: 20,
-                background: "#fff",
-                boxShadow: "0 1px 6px rgba(0,0,0,.05)",
-                minHeight: 170,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 8,
-                }}
-              >
+            <div key={r.symbol} className={styles.stockCard}>
+              <div className={styles.cardHeader}>
                 <div>
-                  <strong style={{ fontSize: 22 }}>{r.symbol}</strong>
-                  {/* Company name under the symbol */}
-                  {r.name && (
-                    <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{r.name}</div>
-                  )}
+                  <div className={styles.symbol}>{r.symbol}</div>
+                  {r.name && <div className={styles.companyName}>{r.name}</div>}
                 </div>
-                <button onClick={() => nav(`/stock/${r.symbol}`)}>Open</button>
+                <button className={styles.openBtn} onClick={() => nav(`/stock/${r.symbol}`)}>
+                  Open →
+                </button>
               </div>
 
-              <div style={{ display: "flex", gap: 18, marginTop: 6, alignItems: "center" }}>
-                <div>
-                  <div>
-                    Price: <b>{price}</b>
+              <div className={styles.cardContent}>
+                <div className={styles.priceInfo}>
+                  <div className={styles.priceRow}>
+                    <span className={styles.label}>Price:</span>
+                    <span className={styles.value}>${price}</span>
                   </div>
-                  <div>
-                    Change: <b>{chg}</b>
+                  <div className={`${styles.priceRow} ${styles.change}`}>
+                    <span className={styles.label}>Change:</span>
+                    <span className={`${styles.value} ${isPositive ? styles.positive : styles.negative}`}>
+                      {isPositive ? "▲" : "▼"} {chg.toFixed(2)}%
+                    </span>
                   </div>
 
-                  <div style={{ marginTop: 10 }}>
-                    Community score: <b>{scorePct}</b>
-                  </div>
-                  <div
-                    style={{
-                      height: 6,
-                      width: 280,
-                      background: "#eee",
-                      borderRadius: 4,
-                      overflow: "hidden",
-                      marginTop: 6,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${((r.communityScore ?? 0) + 1) * 50}%`,
-                        height: "100%",
-                        background: "#7cbf84",
-                      }}
-                    />
+                  <div className={styles.scoreSection}>
+                    <div className={styles.scoreLabel}>Community Score</div>
+                    <div className={styles.scoreValue}>{scorePct}%</div>
+                    <div className={styles.scoreBar}>
+                      <div
+                        className={styles.scoreBarFill}
+                        style={{ width: `${((r.communityScore ?? 0) + 1) * 50}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
 
-                <div style={{ marginLeft: "auto" }}>
+                <div className={styles.sparkChart}>
                   <Spark values={r.candles || []} width={150} height={110} />
                 </div>
               </div>
@@ -252,9 +221,9 @@ export default function Dashboard() {
       </div>
 
       {visible < universe.length && (
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
-          <button onClick={() => setVisible((v) => Math.min(universe.length, v + CHUNK))}>
-            Load more
+        <div className={styles.loadMoreContainer}>
+          <button className={styles.loadMoreBtn} onClick={() => setVisible((v) => Math.min(universe.length, v + CHUNK))}>
+            Load More Stocks
           </button>
         </div>
       )}

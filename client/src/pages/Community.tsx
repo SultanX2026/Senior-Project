@@ -9,6 +9,7 @@ import {
 } from "../api/community";
 import ThreadCard from "../components/ThreadCard";
 import NewThreadForm from "../components/NewThreadForm";
+import styles from "./Community.module.css";
 
 export default function Community() {
   const [sp] = useSearchParams();
@@ -55,39 +56,53 @@ export default function Community() {
   };
 
   return (
-    <div>
-      <h1>Community {symbol ? `— ${symbol}` : ""}</h1>
-      <div style={{ display: "flex", gap: 8 }}>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>💬 Community {symbol ? `— ${symbol}` : ""}</h1>
+        <p className={styles.subtitle}>Share your thoughts and insights with the community</p>
+      </div>
+
+      <div className={styles.controls}>
         {!locked && (
           <input
-            placeholder="Type a symbol"
+            className={styles.symbolInput}
+            placeholder="Type a symbol to filter (e.g., AAPL)..."
             value={symbol}
             onChange={(e) => setSymbol(e.target.value.toUpperCase())}
           />
         )}
-        {locked && <b>{locked}</b>}
-        <button onClick={load} disabled={!symbol}>
-          Refresh
-        </button>
-        <button onClick={onSummarize} disabled={!symbol}>
-          Summarize
-        </button>
+        {locked && <div className={styles.lockedSymbol}>{locked}</div>}
+        <div className={styles.buttonGroup}>
+          <button className={styles.btn} onClick={load} disabled={!symbol}>
+            Refresh
+          </button>
+          <button className={styles.btn} onClick={onSummarize} disabled={!symbol}>
+            Summarize
+          </button>
+        </div>
       </div>
 
-      {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
+      {error && <div className={styles.error}>{error}</div>}
 
       {summary && (
-        <pre style={{ whiteSpace: "pre-wrap", background: "#f7f7f7", padding: 12 }}>
-          {summary}
-        </pre>
+        <div className={styles.summaryCard}>
+          <h2 className={styles.summaryTitle}>📊 Community Summary</h2>
+          <pre className={styles.summaryContent}>{summary}</pre>
+        </div>
       )}
 
       <NewThreadForm onCreate={onCreate} lockedSymbol={locked || undefined} />
 
-      <div style={{ marginTop: 12 }}>
-        {rows.map((t) => (
-          <ThreadCard key={t._id} t={t} />
-        ))}
+      <div className={styles.threadsContainer}>
+        {rows.length === 0 ? (
+          <div className={styles.empty}>
+            <p>No threads yet. Be the first to create one!</p>
+          </div>
+        ) : (
+          rows.map((t) => (
+            <ThreadCard key={t._id} t={t} />
+          ))
+        )}
       </div>
     </div>
   );
