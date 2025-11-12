@@ -1,0 +1,263 @@
+.container {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+}
+
+.searchForm {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 10px 16px;
+  background: #1a1a2e;
+  border: 1px solid #2d2d44;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.searchBtn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.searchBtn:hover {
+  opacity: 0.9;
+}
+
+.loadMoreBtn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.loadMoreBtn:hover {
+  opacity: 0.9;
+}
+
+.stockGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.stockCard {
+  background: #1a1a2e;
+  border: 1px solid #2d2d44;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stockCard:hover {
+  transform: translateY(-4px);
+  border-color: #667eea;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.symbol {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.companyName {
+  font-size: 12px;
+  color: #a0a0c0;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.openBtn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.openBtn:hover {
+  opacity: 0.9;
+}
+
+.cardContent {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  align-items: center;
+}
+
+.priceInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #2d2d44;
+}
+
+.priceRow.change {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 13px;
+  color: #a0a0c0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.value.positive {
+  color: #00ff88;
+}
+
+.value.negative {
+  color: #ff5555;
+}
+
+.scoreSection {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #2d2d44;
+}
+
+.scoreLabel {
+  font-size: 11px;
+  color: #a0a0c0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.scoreValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 8px;
+}
+
+.scoreBar {
+  height: 8px;
+  background: #252541;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.scoreBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #00ff88 100%);
+  transition: width 0.3s ease;
+}
+
+.sparkChart {
+  flex-shrink: 0;
+}
+
+.loadMoreContainer {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+@media (max-width: 1024px) {
+  .stockGrid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchForm {
+    flex-direction: column;
+  }
+
+  .searchInput {
+    width: 100%;
+  }
+
+  .stockGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardContent {
+    flex-direction: column;
+  }
+}

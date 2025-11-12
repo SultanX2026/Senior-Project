@@ -1,6 +1,8 @@
 import { Link, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { logout } from "./api/auth";
+import Chatbot from "./components/Chatbot";
+import "./App.css";
 
 type User = { email: string; username?: string };
 
@@ -30,18 +32,22 @@ export default function App() {
     (user?.email ? user.email.split("@")[0] : "");
 
   return (
-    <div style={{ fontFamily: "ui-sans-serif", padding: 16 }}>
-      <header style={{ display: "flex", gap: 12, marginBottom: 16, alignItems: "center" }}>
-        <Link to="/">Dashboard</Link>
-        <Link to="/community">Community</Link>
-        <Link to="/profile">Profile</Link>
+    <div className="app-container">
+      <header className="app-header">
+        <div className="nav-brand">StockLens</div>
+        <nav className="nav-links">
+          <Link to="/">Dashboard</Link>
+          <Link to="/community">Community</Link>
+          <Link to="/profile">Profile</Link>
+        </nav>
 
-        <div style={{ marginLeft: "auto", display: "flex", gap: 12, alignItems: "center" }}>
-          {!user ? <Link to="/auth">Login</Link> : <span>{displayName}</span>}
-          {user && <button onClick={doLogout}>Logout</button>}
+        <div className="nav-user">
+          {!user ? <Link to="/auth" className="nav-login">Login</Link> : <span className="nav-username">{displayName}</span>}
+          {user && <button className="nav-logout" onClick={doLogout}>Logout</button>}
         </div>
       </header>
       <Outlet />
+      <Chatbot />
     </div>
   );
 }

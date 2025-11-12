@@ -8,6 +8,7 @@ from blueprints.stocks import stocks_bp
 from blueprints.summaries import summaries_bp
 from blueprints.rankings import rank_bp
 from blueprints.news import news_bp
+from blueprints.chatbot import chatbot_bp
 
 
 def create_app() -> Flask:
@@ -30,6 +31,7 @@ def create_app() -> Flask:
     app.register_blueprint(summaries_bp)
     app.register_blueprint(rank_bp)
     app.register_blueprint(news_bp)
+    app.register_blueprint(chatbot_bp)
 
     # Simple health check
     @app.get("/healthz")

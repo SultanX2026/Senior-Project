@@ -1,0 +1,404 @@
+.container {
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: #1a1a2e;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid #2d2d44;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoIcon {
+  font-size: 28px;
+}
+
+.logo h1 {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.headerInfo {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.marketStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  background: #00ff88;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.statusDot.statusOpen {
+  background: #00ff88;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+}
+
+.statusDot.statusClosed {
+  background: #ff5555;
+  animation: none;
+  opacity: 0.6;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.lastUpdate {
+  font-size: 13px;
+  color: #a0a0c0;
+}
+
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 30px;
+}
+
+.leftPanel, .rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.section {
+  background: #1a1a2e;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid #2d2d44;
+  transition: transform 0.3s ease;
+}
+
+.section:hover {
+  transform: translateY(-2px);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sectionHeader h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.stockSymbol {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.stockPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.stockPrice span:first-child {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.stockChange {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stockChange.positive {
+  color: #00ff88;
+}
+
+.stockChange.negative {
+  color: #ff5555;
+}
+
+.stockDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 14px;
+  color: #a0a0c0;
+}
+
+.stockDetails div {
+  padding: 8px 0;
+  border-bottom: 1px solid #2d2d44;
+}
+
+.stockDetails b {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.timeRange {
+  display: flex;
+  gap: 8px;
+}
+
+.rangeBtn {
+  padding: 6px 12px;
+  background: transparent;
+  color: #a0a0c0;
+  border: 1px solid #2d2d44;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.rangeBtn:hover {
+  background: #252541;
+}
+
+.rangeBtn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.chartContainer {
+  height: 300px;
+  position: relative;
+}
+
+.newsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.loading {
+  text-align: center;
+  color: #a0a0c0;
+  padding: 40px;
+}
+
+.newsItem {
+  padding: 16px;
+  background: #252541;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.newsItem:hover {
+  background: #2d2d44;
+  transform: translateX(5px);
+}
+
+.newsTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.newsDescription {
+  font-size: 13px;
+  color: #a0a0c0;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.newsMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #a0a0c0;
+}
+
+.companyInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.companyName {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.companyDetails {
+  font-size: 13px;
+  color: #a0a0c0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 12px;
+  display: inline-block;
+}
+
+.link:hover {
+  color: #764ba2;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  color: #a0a0c0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.communityInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sentimentScore {
+  text-align: center;
+}
+
+.scoreLabel {
+  font-size: 12px;
+  color: #a0a0c0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scoreValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: #00ff88;
+}
+
+.scoreBar {
+  height: 12px;
+  background: #252541;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.scoreBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.communityBtn {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.communityBtn:hover {
+  opacity: 0.9;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d2d44;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #667eea;
+}
+
+@media (max-width: 1200px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+  
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .headerInfo {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

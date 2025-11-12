@@ -2,32 +2,28 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getQuote, getCandles, getProfile, getMetrics } from "../api/stocks";
 import { communitySentiment } from "../api/community";
-import BigChart from "../components/BigChart";
 import { getNews, Article as NewsArticle } from "../api/news";
+import styles from "./Stock.module.css";
 
-type View = "1D" | "5D" | "1M" | "6M";
+type View = "1d" | "5d" | "1mo" | "1y";
 
 const VIEW_TO_REQ = (v: View) => {
   switch (v) {
-    case "1D": return { resolution: "60" as const, count: 8 };         // ~8 trading hours
-    case "5D": return { resolution: "60" as const, count: 40 };        // 5 * 8h
-    case "1M": return { resolution: "D"  as const, count: 30 };
-    case "6M": return { resolution: "D"  as const, count: 180 };
+    case "1d": return { resolution: "60" as const, count: 8 };
+    case "5d": return { resolution: "60" as const, count: 40 };
+    case "1mo": return { resolution: "D" as const, count: 30 };
+    case "1y": return { resolution: "W" as const, count: 52 };
   }
 };
 
-// put this near the top of Stock.tsx (or inside the component before return)
 function formatNewsDate(d?: string | number | null) {
   if (!d) return "";
   if (typeof d === "number") {
-    // epoch seconds -> ms
     return new Date(d * 1000).toLocaleDateString();
   }
-  // ISO string
   const t = Date.parse(d);
   return Number.isNaN(t) ? "" : new Date(t).toLocaleDateString();
 }
-
 
 export default function Stock() {
   const nav = useNavigate();
@@ -38,165 +34,360 @@ export default function Stock() {
   const [profile, setProfile] = useState<any>(null);
   const [metrics, setMetrics] = useState<any>({});
   const [comm, setComm] = useState<any>(null);
-
-  const [view, setView] = useState<View>("1D");
-  const [candles, setCandles] = useState<number[]>([]);
-  const [times, setTimes] = useState<number[]>([]);
-
+  const [view, setView] = useState<View>("1d");
+  const [candles, setCandles] = useState<{ o?: number[]; h?: number[]; l?: number[]; c?: number[]; t?: number[] }>({});
   const [news, setNews] = useState<NewsArticle[]>([]);
+  const [chart, setChart] = useState<any>(null);
+  const [marketOpen, setMarketOpen] = useState(false);
 
-  // core (doesn't depend on view)
+  // Check if market is open (US stock market: Mon-Fri 9:30 AM - 4:00 PM ET)
+  useEffect(() => {
+    const checkMarketStatus = () => {
+      const now = new Date();
+      // Convert to ET timezone
+      const etTime = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+      const day = etTime.getDay();
+      const hours = etTime.getHours();
+      const minutes = etTime.getMinutes();
+      const currentMinutes = hours * 60 + minutes;
+
+      // Market open: Monday (1) - Friday (5), 9:30 AM (570 min) - 4:00 PM (960 min)
+      const isOpen = day >= 1 && day <= 5 && currentMinutes >= 570 && currentMinutes < 960;
+      setMarketOpen(isOpen);
+    };
+
+    checkMarketStatus();
+    const interval = setInterval(checkMarketStatus, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch core data
   useEffect(() => {
     (async () => {
-      const [q, prof, metr, c] = await Promise.all([
-        getQuote(symbol),
-        getProfile(symbol),
-        getMetrics(symbol),
-        communitySentiment(symbol).catch(() => null),
-      ]);
-      if (q && q.ok !== false) setQuote(q);
-      if (prof && prof.ok !== false) setProfile(prof);
-      if (metr && metr.metric) setMetrics(metr.metric);
-      if (c) setComm(c);
+      try {
+        const [q, prof, metr, c] = await Promise.all([
+          getQuote(symbol),
+          getProfile(symbol),
+          getMetrics(symbol),
+          communitySentiment(symbol).catch(() => null),
+        ]);
+        if (q && q.ok !== false) setQuote(q);
+        if (prof && prof.ok !== false) setProfile(prof);
+        if (metr && metr.metric) setMetrics(metr.metric);
+        if (c) setComm(c);
+      } catch (e) {
+        console.error("Error fetching stock data:", e);
+      }
     })();
   }, [symbol]);
 
-  // candles (depends on view)
+  // Fetch candles
   useEffect(() => {
     (async () => {
-      const req = VIEW_TO_REQ(view);
-      const cndl = await getCandles(symbol, req.resolution, req.count);
-      if (cndl && Array.isArray(cndl.c)) {
-        setCandles(cndl.c);
-        setTimes(Array.isArray(cndl.t) ? cndl.t : []);
-      } else {
-        setCandles([]);
-        setTimes([]);
+      try {
+        const req = VIEW_TO_REQ(view);
+        const cndl = await getCandles(symbol, req.resolution, req.count);
+        if (cndl && Array.isArray(cndl.c)) {
+          setCandles(cndl);
+        } else {
+          setCandles({});
+        }
+      } catch (e) {
+        console.error("Error fetching candles:", e);
+        setCandles({});
       }
     })();
   }, [symbol, view]);
 
-  // news
+  // Fetch news
   useEffect(() => {
     (async () => {
-      const items = await getNews(symbol, 8);
-      setNews(items ?? []);
+      try {
+        const items = await getNews(symbol, 8);
+        setNews(items ?? []);
+      } catch (e) {
+        console.error("Error fetching news:", e);
+        setNews([]);
+      }
     })();
   }, [symbol]);
 
+  // Initialize or update chart
+  useEffect(() => {
+    const initChart = () => {
+      if (!candles.c || candles.c.length === 0) return;
+      
+      const ctx = document.getElementById("stockChart") as HTMLCanvasElement;
+      if (!ctx) return;
+
+      const chartLib = (window as any).Chart;
+      if (!chartLib) {
+        console.error("Chart.js not loaded");
+        return;
+      }
+
+      try {
+        // Destroy existing chart if it exists
+        if (chart) {
+          chart.destroy();
+        }
+
+        const newChart = new chartLib(ctx, {
+          type: "line",
+          data: {
+            labels: (candles.t || []).map((t: number) => new Date(t * 1000).toLocaleDateString()),
+            datasets: [
+              {
+                label: symbol,
+                data: candles.c,
+                borderColor: "#667eea",
+                backgroundColor: "rgba(102, 126, 234, 0.1)",
+                tension: 0.1,
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: { 
+                beginAtZero: false,
+                ticks: {
+                  color: "#a0a0c0",
+                },
+                grid: {
+                  color: "rgba(102, 126, 234, 0.1)",
+                },
+              },
+              x: {
+                ticks: {
+                  color: "#a0a0c0",
+                },
+                grid: {
+                  color: "rgba(102, 126, 234, 0.1)",
+                },
+              },
+            },
+          },
+        });
+        setChart(newChart);
+      } catch (e) {
+        console.error("Error initializing chart:", e);
+      }
+    };
+
+    // Small delay to ensure Chart.js is loaded
+    const timer = setTimeout(initChart, 100);
+    return () => clearTimeout(timer);
+  }, [candles, view]);
+
   const q = quote || {};
   const c = comm || {};
-  const pretty = (n: any, d = 2) => (typeof n === "number" && isFinite(n) ? n.toFixed(d) : "—");
-  const capB = (n: any) => (typeof n === "number" && isFinite(n) && n > 0 ? (n / 1_000_000_000).toFixed(2) : "—");
-
-  const ResButton = ({ v }: { v: View }) => (
-    <button
-      onClick={() => setView(v)}
-      style={{
-        marginLeft: 8,
-        padding: "4px 8px",
-        border: "1px solid #ccc",
-        borderRadius: 6,
-        background: view === v ? "#eee" : "#fff",
-        fontWeight: view === v ? 700 : 400,
-      }}
-    >
-      {v}
-    </button>
-  );
+  const isPositive = (q.dp ?? 0) >= 0;
 
   return (
-      <div>
-        <h1>{symbol} — Stats</h1>
-
-        <div style={{display:"grid", gridTemplateColumns:"1.35fr .65fr", gap:16, alignItems:"start"}}>
-          {/* left column */}
-          <div style={{border:"1px solid #ddd", borderRadius:12, padding:12, background:"#fff"}}>
-            <div style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
-              <h3 style={{margin:0}}>Price</h3>
-              <div>
-                <ResButton v="1D" />
-                <ResButton v="5D" />
-                <ResButton v="1M" />
-                <ResButton v="6M" />
-              </div>
-            </div>
-
-            <div style={{marginBottom:12}}>
-              <div>Last: <b>{q.c ?? "—"}</b></div>
-              <div>Change: <b>{typeof q.dp==='number' ? `${q.dp.toFixed(2)}%` : "—"}</b></div>
-              <div>Open / High / Low: {q.o ?? "—"} / {q.h ?? "—"} / {q.l ?? "—"}</div>
-              <div>Prev Close: {q.pc ?? "—"}</div>
-            </div>
-
-            <BigChart
-              values={candles}
-              times={times}
-              width={980}
-              height={340}
-              resolution={VIEW_TO_REQ(view).resolution}
-            />
-
-            {/* news */}
-            <div style={{ marginTop: 18, borderTop: "1px solid #eee", paddingTop: 12 }}>
-              <h3 style={{ margin: "0 0 10px 0" }}>Latest news</h3>
-              {news.length === 0 ? (
-                <div style={{ color: "#666" }}>No recent articles.</div>
-              ) : (
-                <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap:12}}>
-                  {news.map((a) => (
-                    <a key={a.url} href={a.url} target="_blank" rel="noreferrer" style={{textDecoration:"none", color:"inherit"}}>
-                      <div style={{border:"1px solid #ddd", borderRadius:10, overflow:"hidden", background:"#fff", height:"100%", display:"flex", flexDirection:"column"}}>
-                        {a.image && (
-                          <img src={a.image} alt="" loading="lazy" style={{ width:"100%", height:140, objectFit:"cover" }} />
-                        )}
-                        <div style={{ padding:10, display:"flex", flexDirection:"column", gap:6 }}>
-                          <div style={{ fontSize:12, color:"#666" }}>
-                            {a.source || "News"}
-                            {a.publishedAt ? ` · ${formatNewsDate(a.publishedAt)}` : ""}
-                          </div>
-                          <div style={{ fontWeight:600, lineHeight:1.2 }}>{a.title}</div>
-                          {a.description && <div style={{ fontSize:13, color:"#444" }}>{a.description}</div>}
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
+    <div className={styles.container}>
+      {/* Header */}
+      <header className={styles.header}>
+        <div className={styles.logo}>
+          <div className={styles.logoIcon}>📈</div>
+          <h1>Stock Lens</h1>
+        </div>
+        <div className={styles.headerInfo}>
+          <div className={styles.marketStatus}>
+            <span className={`${styles.statusDot} ${marketOpen ? styles.statusOpen : styles.statusClosed}`}></span>
+            <span id="market-status">{marketOpen ? "Market Open" : "Market Closed"}</span>
           </div>
-
-          {/* right column */}
-          <div style={{display:"grid", gap:16}}>
-            <div style={{border:"1px solid #ddd", borderRadius:12, padding:12, background:"#fff"}}>
-              <h3>Company</h3>
-              <div><b>{profile?.name || profile?.ticker || symbol}</b></div>
-              <div>{profile?.exchange} · {profile?.currency}</div>
-              <div>{profile?.finnhubIndustry}</div>
-              {profile?.country && <div>Country: {profile.country}</div>}
-              {profile?.weburl && <div style={{marginTop:6}}><a href={profile.weburl} target="_blank">Website ↗</a></div>}
-            </div>
-
-            <div style={{border:"1px solid #ddd", borderRadius:12, padding:12, background:"#fff"}}>
-              <h3>Key Metrics</h3>
-              <div>Market Cap: <b>{capB(metrics?.marketCapitalization)}</b> B</div>
-              <div>52W High / Low: <b>{pretty(metrics?.["52WeekHigh"])}</b> / <b>{pretty(metrics?.["52WeekLow"])}</b></div>
-              <div>PE (TTM): <b>{pretty(metrics?.peBasicExclExtraTTM)}</b></div>
-              <div>EPS (TTM): <b>{pretty(metrics?.epsBasicExclExtraItemsTTM)}</b></div>
-              <div>Revenue (TTM): <b>{capB(metrics?.revenueTTM)}</b> B</div>
-              <div>Net Margin (TTM): <b>{pretty(metrics?.netProfitMarginTTM)}</b></div>
-            </div>
-
-            <div style={{border:"1px solid #ddd", borderRadius:12, padding:12, background:"#fff"}}>
-              <h3>Community</h3>
-              <div>Score: <b>{typeof c.score==='number' ? (c.score*100).toFixed(0) : "—"}</b></div>
-              <div style={{height:8, background:"#eee", borderRadius:4, overflow:"hidden", marginTop:4}}>
-                <div style={{width:`${((c.score??0)+1)*50}%`, height:"100%", background:"#7cbf84"}} />
-              </div>
-              <button style={{marginTop:12}} onClick={()=>nav(`/community?symbol=${symbol}`)}>Open Community</button>
-            </div>
+          <div className={styles.lastUpdate}>
+            Last updated: <span id="last-update">{new Date().toLocaleTimeString()}</span>
           </div>
         </div>
+      </header>
+
+      {/* Main Content */}
+      <div className={styles.mainContent}>
+        {/* Left Panel */}
+        <div className={styles.leftPanel}>
+          {/* Stock Info Section */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.stockSymbol}>{symbol}</h2>
+              <div className={styles.stockPrice}>
+                <span>${q.c ?? "—"}</span>
+                <span className={`${styles.stockChange} ${isPositive ? styles.positive : styles.negative}`}>
+                  {isPositive ? "▲" : "▼"} {typeof q.dp === "number" ? `${q.dp.toFixed(2)}%` : "—"}
+                </span>
+              </div>
+            </div>
+            <div className={styles.stockDetails}>
+              <div>Open: <b>${q.o ?? "—"}</b></div>
+              <div>High: <b>${q.h ?? "—"}</b></div>
+              <div>Low: <b>${q.l ?? "—"}</b></div>
+              <div>Prev Close: <b>${q.pc ?? "—"}</b></div>
+            </div>
+          </section>
+
+          {/* Chart Section */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 id="chart-title">{symbol} Price Chart</h2>
+              <div className={styles.timeRange}>
+                {(["1d", "5d", "1mo", "1y"] as View[]).map((v) => (
+                  <button
+                    key={v}
+                    className={`${styles.rangeBtn} ${view === v ? styles.active : ""}`}
+                    onClick={() => setView(v)}
+                  >
+                    {v.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={styles.chartContainer}>
+              <canvas id="stockChart"></canvas>
+            </div>
+          </section>
+
+          {/* News Section */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>Market News</h2>
+            </div>
+            <div className={styles.newsContainer}>
+              {news.length === 0 ? (
+                <div className={styles.loading}>Loading news...</div>
+              ) : (
+                news.map((a) => (
+                  <a
+                    key={a.url}
+                    href={a.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.newsItem}
+                  >
+                    <div className={styles.newsTitle}>{a.title}</div>
+                    {a.description && (
+                      <div className={styles.newsDescription}>{a.description}</div>
+                    )}
+                    <div className={styles.newsMeta}>
+                      <span>{a.source || "News"}</span>
+                      <span>{formatNewsDate(a.publishedAt)}</span>
+                    </div>
+                  </a>
+                ))
+              )}
+            </div>
+          </section>
+        </div>
+
+        {/* Right Panel */}
+        <div className={styles.rightPanel}>
+          {/* Company Info */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>Company</h2>
+            </div>
+            <div className={styles.companyInfo}>
+              <div className={styles.companyName}>
+                {profile?.name || profile?.ticker || symbol}
+              </div>
+              <div className={styles.companyDetails}>
+                <div>{profile?.exchange} · {profile?.currency}</div>
+                <div>{profile?.finnhubIndustry}</div>
+                {profile?.country && <div>📍 {profile.country}</div>}
+              </div>
+              {profile?.weburl && (
+                <a href={profile.weburl} target="_blank" rel="noreferrer" className={styles.link}>
+                  Visit Website →
+                </a>
+              )}
+            </div>
+          </section>
+
+          {/* Key Metrics */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>Key Metrics</h2>
+            </div>
+            <div className={styles.metricsGrid}>
+              <div className={styles.metric}>
+                <span className={styles.label}>Market Cap</span>
+                <span className={styles.value}>
+                  {metrics?.marketCapitalization
+                    ? `$${(metrics.marketCapitalization / 1_000_000_000).toFixed(2)}B`
+                    : "—"}
+                </span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.label}>52W High</span>
+                <span className={styles.value}>
+                  ${metrics?.["52WeekHigh"]?.toFixed(2) || "—"}
+                </span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.label}>52W Low</span>
+                <span className={styles.value}>
+                  ${metrics?.["52WeekLow"]?.toFixed(2) || "—"}
+                </span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.label}>P/E Ratio</span>
+                <span className={styles.value}>
+                  {metrics?.peBasicExclExtraTTM?.toFixed(2) || "—"}
+                </span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.label}>EPS (TTM)</span>
+                <span className={styles.value}>
+                  ${metrics?.epsBasicExclExtraItemsTTM?.toFixed(2) || "—"}
+                </span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.label}>Revenue (TTM)</span>
+                <span className={styles.value}>
+                  ${(metrics?.revenueTTM / 1_000_000_000)?.toFixed(2) || "—"}B
+                </span>
+              </div>
+            </div>
+          </section>
+
+          {/* Community Section */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>Community</h2>
+            </div>
+            <div className={styles.communityInfo}>
+              <div className={styles.sentimentScore}>
+                <div className={styles.scoreLabel}>Sentiment Score</div>
+                <div className={styles.scoreValue}>
+                  {typeof c.score === "number" ? (c.score * 100).toFixed(0) : "—"}%
+                </div>
+              </div>
+              <div className={styles.scoreBar}>
+                <div
+                  className={styles.scoreBarFill}
+                  style={{
+                    width: `${((c.score ?? 0) + 1) * 50}%`,
+                  }}
+                ></div>
+              </div>
+              <button
+                className={styles.communityBtn}
+                onClick={() => nav(`/community?symbol=${symbol}`)}
+              >
+                View Community Threads →
+              </button>
+            </div>
+          </section>
+        </div>
       </div>
+    </div>
   );
 }
