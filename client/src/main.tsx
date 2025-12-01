@@ -6,7 +6,9 @@ import Dashboard from "./pages/Dashboard";
 import Community from "./pages/Community";
 import Stock from "./pages/Stock";
 import Auth from "./pages/Auth";
+import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const router = createBrowserRouter([
   { path: "/", element: <App />, children: [
@@ -14,7 +16,9 @@ const router = createBrowserRouter([
       { path: "community", element: <Community /> },
       { path: "stock/:symbol", element: <Stock /> },
       { path: "auth", element: <Auth /> },
+      { path: "register", element: <Register /> },
       { path: "profile", element: <Profile /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
   ]}
 ]);
 

@@ -4,7 +4,6 @@ import { useSearchParams } from "react-router-dom";
 import {
   listThreads,
   createThread,
-  summarizeCommunity,
   Thread,
 } from "../api/community";
 import ThreadCard from "../components/ThreadCard";
@@ -16,7 +15,6 @@ export default function Community() {
   const locked = (sp.get("symbol") || "").toUpperCase();
   const [symbol, setSymbol] = useState(locked || "");
   const [rows, setRows] = useState<Thread[]>([]);
-  const [summary, setSummary] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
@@ -46,15 +44,6 @@ export default function Community() {
     }
   };
 
-  const onSummarize = async () => {
-    if (!symbol) {
-      setError("Pick a symbol first.");
-      return;
-    }
-    const s = await summarizeCommunity(symbol);
-    setSummary(s.summary || "");
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -72,24 +61,9 @@ export default function Community() {
           />
         )}
         {locked && <div className={styles.lockedSymbol}>{locked}</div>}
-        <div className={styles.buttonGroup}>
-          <button className={styles.btn} onClick={load} disabled={!symbol}>
-            Refresh
-          </button>
-          <button className={styles.btn} onClick={onSummarize} disabled={!symbol}>
-            Summarize
-          </button>
-        </div>
       </div>
 
       {error && <div className={styles.error}>{error}</div>}
-
-      {summary && (
-        <div className={styles.summaryCard}>
-          <h2 className={styles.summaryTitle}>📊 Community Summary</h2>
-          <pre className={styles.summaryContent}>{summary}</pre>
-        </div>
-      )}
 
       <NewThreadForm onCreate={onCreate} lockedSymbol={locked || undefined} />
 

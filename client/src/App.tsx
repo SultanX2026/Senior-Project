@@ -5,13 +5,29 @@ import Chatbot from "./components/Chatbot";
 import "./App.css";
 
 type User = { email: string; username?: string };
+type Theme = "dark" | "light";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem("sl_theme");
+    return (saved as Theme) || "dark";
+  });
 
   const readUser = () => {
-    const u = localStorage.getItem("sl_user");
-    setUser(u ? (JSON.parse(u) as User) : null);
+    try {
+      const u = localStorage.getItem("sl_user");
+      if (!u) {
+        setUser(null);
+        return;
+      }
+      const parsed = JSON.parse(u);
+      setUser(parsed && typeof parsed === "object" ? (parsed as User) : null);
+    } catch (err) {
+      console.error("Error parsing user from localStorage:", err);
+      localStorage.removeItem("sl_user");
+      setUser(null);
+    }
   };
 
   useEffect(() => {
@@ -25,6 +41,15 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("sl_theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "dark" ? "light" : "dark");
+  };
+
   const doLogout = () => { logout(); readUser(); };
 
   const displayName =
@@ -32,7 +57,7 @@ export default function App() {
     (user?.email ? user.email.split("@")[0] : "");
 
   return (
-    <div className="app-container">
+    <div className="app-container" data-theme={theme}>
       <header className="app-header">
         <div className="nav-brand">StockLens</div>
         <nav className="nav-links">
@@ -46,7 +71,7 @@ export default function App() {
           {user && <button className="nav-logout" onClick={doLogout}>Logout</button>}
         </div>
       </header>
-      <Outlet />
+      <Outlet context={{ theme, toggleTheme }} />
       <Chatbot />
     </div>
   );

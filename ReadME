@@ -5,3 +5,5 @@ docker compose up
 docker compose logs -f api
 
 http://localhost:5173/
+
+docker compose up --build

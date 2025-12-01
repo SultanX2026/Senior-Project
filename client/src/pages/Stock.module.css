@@ -9,11 +9,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 30px;
-  background: #1a1a2e;
+  background: var(--bg-secondary);
   border-radius: 16px;
   margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid #2d2d44;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
 }
 
 .logo {
@@ -75,7 +75,7 @@
 
 .lastUpdate {
   font-size: 13px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
 }
 
 .mainContent {
@@ -91,11 +91,11 @@
 }
 
 .section {
-  background: #1a1a2e;
+  background: var(--bg-secondary);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid #2d2d44;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
   transition: transform 0.3s ease;
 }
 
@@ -119,7 +119,7 @@
 .stockSymbol {
   font-size: 32px !important;
   font-weight: 700 !important;
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
 }
 
 .stockPrice {
@@ -152,16 +152,16 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   font-size: 14px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
 }
 
 .stockDetails div {
   padding: 8px 0;
-  border-bottom: 1px solid #2d2d44;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .stockDetails b {
-  color: #ffffff;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -173,8 +173,8 @@
 .rangeBtn {
   padding: 6px 12px;
   background: transparent;
-  color: #a0a0c0;
-  border: 1px solid #2d2d44;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
@@ -183,7 +183,7 @@
 }
 
 .rangeBtn:hover {
-  background: #252541;
+  background: var(--bg-tertiary);
 }
 
 .rangeBtn.active {
@@ -195,6 +195,11 @@
 .chartContainer {
   height: 300px;
   position: relative;
+  background: transparent;
+}
+
+.chartContainer canvas {
+  background: transparent !important;
 }
 
 .newsContainer {
@@ -207,13 +212,13 @@
 
 .loading {
   text-align: center;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   padding: 40px;
 }
 
 .newsItem {
   padding: 16px;
-  background: #252541;
+  background: var(--bg-tertiary);
   border-radius: 10px;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -223,7 +228,7 @@
 }
 
 .newsItem:hover {
-  background: #2d2d44;
+  background: var(--border-color);
   transform: translateX(5px);
 }
 
@@ -231,12 +236,12 @@
   font-size: 15px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .newsDescription {
   font-size: 13px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   margin-bottom: 10px;
   line-height: 1.5;
 }
@@ -245,7 +250,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
 }
 
 .companyInfo {
@@ -257,12 +262,12 @@
 .companyName {
   font-size: 18px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .companyDetails {
   font-size: 13px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -294,7 +299,7 @@
 
 .label {
   font-size: 12px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -302,7 +307,7 @@
 .value {
   font-size: 16px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .communityInfo {
@@ -317,7 +322,7 @@
 
 .scoreLabel {
   font-size: 12px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -330,7 +335,7 @@
 
 .scoreBar {
   height: 12px;
-  background: #252541;
+  background: var(--bg-tertiary);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -366,7 +371,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2d2d44;
+  background: var(--border-color);
   border-radius: 4px;
 }
 

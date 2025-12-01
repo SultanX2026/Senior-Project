@@ -33,10 +33,10 @@
 .searchInput {
   flex: 1;
   padding: 10px 16px;
-  background: #1a1a2e;
-  border: 1px solid #2d2d44;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 14px;
   transition: all 0.3s;
 }
@@ -86,11 +86,11 @@
 }
 
 .stockCard {
-  background: #1a1a2e;
-  border: 1px solid #2d2d44;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
   min-height: 240px;
   display: flex;
@@ -113,13 +113,13 @@
 .symbol {
   font-size: 28px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .companyName {
   font-size: 12px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   margin-top: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -161,7 +161,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #2d2d44;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .priceRow.change {
@@ -170,7 +170,7 @@
 
 .label {
   font-size: 13px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -178,7 +178,7 @@
 .value {
   font-size: 16px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .value.positive {
@@ -192,12 +192,12 @@
 .scoreSection {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #2d2d44;
+  border-top: 1px solid var(--border-color);
 }
 
 .scoreLabel {
   font-size: 11px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
@@ -212,7 +212,7 @@
 
 .scoreBar {
   height: 8px;
-  background: #252541;
+  background: var(--bg-tertiary);
   border-radius: 4px;
   overflow: hidden;
 }

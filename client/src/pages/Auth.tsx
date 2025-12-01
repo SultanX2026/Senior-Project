@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { login, register } from "../api/auth";
-import { useNavigate } from "react-router-dom";
+import { login } from "../api/auth";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./Auth.module.css";
 
 export default function Auth() {
@@ -11,28 +11,41 @@ export default function Auth() {
   const nav = useNavigate();
 
   const handleLogin = async () => {
+    // Validation
+    if (!email.trim()) {
+      setMsg("Please enter an email address");
+      return;
+    }
+    if (!email.includes("@")) {
+      setMsg("Please enter a valid email address");
+      return;
+    }
+    if (!password) {
+      setMsg("Please enter a password");
+      return;
+    }
+    
     setIsLoading(true);
     try {
       await login(email, password);
       setMsg("Logged in successfully!");
       setTimeout(() => nav("/profile"), 500);
-    } catch {
-      setMsg("Login failed. Please try again.");
+    } catch (err: any) {
+      const error = err?.response?.data?.error || err?.message || "Login failed";
+      if (error === "bad creds") {
+        setMsg("Invalid email or password");
+      } else {
+        setMsg(`Login failed: ${error}`);
+      }
+      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRegister = async () => {
-    setIsLoading(true);
-    try {
-      await register(email, password);
-      setMsg("Registered and logged in!");
-      setTimeout(() => nav("/profile"), 500);
-    } catch {
-      setMsg("Registration failed. Email may already exist.");
-    } finally {
-      setIsLoading(false);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleLogin();
     }
   };
 
@@ -53,7 +66,9 @@ export default function Auth() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyPress={handleKeyPress}
               disabled={isLoading}
+              autoComplete="email"
             />
           </div>
 
@@ -65,32 +80,33 @@ export default function Auth() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyPress={handleKeyPress}
               disabled={isLoading}
+              autoComplete="current-password"
             />
           </div>
 
-          <div className={styles.buttonGroup}>
-            <button
-              className={styles.button}
-              onClick={handleLogin}
-              disabled={isLoading}
-            >
-              {isLoading ? "Loading..." : "Login"}
-            </button>
-            <button
-              className={`${styles.button} ${styles.secondary}`}
-              onClick={handleRegister}
-              disabled={isLoading}
-            >
-              {isLoading ? "Loading..." : "Register"}
-            </button>
-          </div>
+          <button
+            className={styles.button}
+            onClick={handleLogin}
+            disabled={isLoading}
+            style={{ marginTop: "20px" }}
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
+          </button>
 
           {msg && (
             <div className={`${styles.message} ${msg.includes("failed") ? styles.error : styles.success}`}>
               {msg}
             </div>
           )}
+
+          <p className={styles.footerText}>
+            Don't have an account? <Link to="/register" className={styles.link}>Create one here</Link>
+          </p>
+          <p className={styles.footerText}>
+            Forgot your password? <Link to="/forgot-password" className={styles.link}>Reset here</Link>
+          </p>
         </div>
       </div>
     </div>
