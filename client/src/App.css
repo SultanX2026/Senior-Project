@@ -57,7 +57,7 @@ html, body, #root {
 .nav-brand {
   font-size: 20px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #90caf9 0%, #5c6bc0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -93,7 +93,7 @@ html, body, #root {
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #90caf9, #e1f5fe);
   transition: width 0.3s;
 }
 
@@ -109,12 +109,12 @@ html, body, #root {
 }
 
 .nav-login {
-  color: #667eea;
+  color: #90caf9;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
   padding: 8px 16px;
-  border: 1px solid #667eea;
+  border: 1px solid #90caf9;
   border-radius: 6px;
   transition: all 0.3s;
 }
@@ -132,7 +132,7 @@ html, body, #root {
 
 .nav-logout {
   padding: 8px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #90caf9 0%, #5c6bc0 100%);
   color: white;
   border: none;
   border-radius: 6px;
