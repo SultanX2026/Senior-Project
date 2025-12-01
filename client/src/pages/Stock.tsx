@@ -127,6 +127,13 @@ export default function Stock() {
       }
 
       try {
+        // Get current theme
+        const theme = document.documentElement.getAttribute("data-theme") || "dark";
+        const isDark = theme === "dark";
+        
+        const tickColor = isDark ? "#a0a0c0" : "#666666";
+        const gridColor = isDark ? "rgba(102, 126, 234, 0.1)" : "rgba(102, 126, 234, 0.05)";
+        
         // Destroy existing chart if it exists
         if (chart) {
           chart.destroy();
@@ -147,6 +154,7 @@ export default function Stock() {
                 borderWidth: 2,
                 pointRadius: 0,
                 pointHoverRadius: 6,
+                spanGaps: false,
               },
             ],
           },
@@ -155,23 +163,29 @@ export default function Stock() {
             maintainAspectRatio: false,
             plugins: {
               legend: { display: false },
+              tooltip: {
+                backgroundColor: isDark ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.9)",
+                titleColor: isDark ? "#fff" : "#000",
+                bodyColor: isDark ? "#fff" : "#000",
+                borderColor: isDark ? "#2d2d44" : "#e5e5e7",
+              },
             },
             scales: {
               y: { 
                 beginAtZero: false,
                 ticks: {
-                  color: "#a0a0c0",
+                  color: tickColor,
                 },
                 grid: {
-                  color: "rgba(102, 126, 234, 0.1)",
+                  color: gridColor,
                 },
               },
               x: {
                 ticks: {
-                  color: "#a0a0c0",
+                  color: tickColor,
                 },
                 grid: {
-                  color: "rgba(102, 126, 234, 0.1)",
+                  color: gridColor,
                 },
               },
             },
@@ -186,7 +200,7 @@ export default function Stock() {
     // Small delay to ensure Chart.js is loaded
     const timer = setTimeout(initChart, 100);
     return () => clearTimeout(timer);
-  }, [candles, view]);
+  }, [candles, view, chart]);
 
   const q = quote || {};
   const c = comm || {};

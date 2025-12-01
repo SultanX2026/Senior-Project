@@ -5,16 +5,21 @@
 }
 
 .card {
-  background: #1a1a2e;
-  border: 1px solid #2d2d44;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--card-shadow);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .header {
   margin-bottom: 40px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .title {
@@ -28,14 +33,35 @@
 }
 
 .subtitle {
-  color: #a0a0c0;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
 
 .notLoggedIn {
-  color: #a0a0c0;
+  color: var(--text-secondary);
   margin: 20px 0;
+}
+
+.themeToggle {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.themeToggle:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.themeToggle:active {
+  transform: translateY(0);
 }
 
 .link {
@@ -107,7 +133,7 @@
 
 .label {
   font-size: 13px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
@@ -115,10 +141,10 @@
 
 .input {
   padding: 12px 16px;
-  background: #252541;
-  border: 1px solid #2d2d44;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 14px;
   transition: all 0.3s;
 }
@@ -136,12 +162,12 @@
 
 .colorGrid {
   padding-top: 20px;
-  border-top: 1px solid #2d2d44;
+  border-top: 1px solid var(--border-color);
 }
 
 .colorLabel {
   font-size: 13px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
@@ -162,7 +188,7 @@
   border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.3s;
-  outline: 1px solid #2d2d44;
+  outline: 1px solid var(--border-color);
 }
 
 .colorBtn:hover {
@@ -172,7 +198,7 @@
 
 .colorBtn.active {
   border-color: #667eea;
-  box-shadow: 0 0 0 2px #1a1a2e, 0 0 0 4px #667eea;
+  box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 0 4px #667eea;
 }
 
 .saveBtn {
@@ -211,6 +237,117 @@
   background: rgba(255, 85, 85, 0.1);
   color: #ff5555;
   border: 1px solid #ff5555;
+}
+
+.securityCard {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.securityHeader {
+  margin-bottom: 20px;
+}
+
+.securityTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+}
+
+.securitySubtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 0;
+}
+
+.editSecurityBtn {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.editSecurityBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.securityForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.select {
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.securityButtonGroup {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 12px 16px;
+  background: transparent;
+  border: 1px solid #667eea;
+  color: #667eea;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {

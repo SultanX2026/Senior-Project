@@ -7,6 +7,13 @@ import {
   Comment,
   Thread,
 } from "../api/community";
+import styles from "./ThreadCard.module.css";
+
+// Helper to get current theme
+const getTheme = () => {
+  const theme = document.documentElement.getAttribute("data-theme");
+  return theme === "light" ? "light" : "dark";
+};
 
 type Author = { id?: string; username?: string; avatarColor?: string; email?: string };
 
@@ -42,6 +49,16 @@ export default function ThreadCard({ t }: { t: Thread }) {
   const [replyFor, setReplyFor] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [counts, setCounts] = useState({ up: t.up || 0, down: t.down || 0 });
+  const [theme, setTheme] = useState<"dark" | "light">(getTheme());
+
+  useEffect(() => {
+    const checkTheme = () => {
+      setTheme(getTheme());
+    };
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   const load = async () => {
     const res = await listComments(t._id);
@@ -130,37 +147,28 @@ export default function ThreadCard({ t }: { t: Thread }) {
     };
 
     return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "28px 1fr",
-          gap: 8,
-          padding: "8px 0",
-          borderTop: "1px solid #eee",
-        }}
-      >
+        <div className={styles.comment}>
         <Avatar author={c.author as Author} />
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontWeight: 600 }}>{c.author?.username || "user"}</span>
           </div>
-          <div style={{ marginTop: 4 }}>{c.body}</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-            <button onClick={() => onVote(true)}>▲ {cu.up}</button>
-            <span style={{ minWidth: 20, textAlign: "center" }}>{netc}</span>
-            <button onClick={() => onVote(false)}>▼ {cu.down}</button>
-            <button style={{ marginLeft: "auto" }} onClick={() => setReplyFor(c._id)}>
+          <div className={styles.commentBody}>{c.body}</div>
+          <div className={styles.commentControls}>
+            <button className={styles.commentVoteButton} onClick={() => onVote(true)}>▲ {cu.up}</button>
+            <span className={styles.voteCount}>{netc}</span>
+            <button className={styles.commentVoteButton} onClick={() => onVote(false)}>▼ {cu.down}</button>
+            <button className={styles.replyButton} onClick={() => setReplyFor(c._id)}>
               Reply
             </button>
           </div>
 
           {replyFor === c._id && (
-            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+            <div className={styles.replyForm}>
               <input
                 placeholder="Write a reply…"
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
-                style={{ flex: 1 }}
               />
               <button onClick={() => onReply(c._id)}>Post</button>
               <button
@@ -176,12 +184,12 @@ export default function ThreadCard({ t }: { t: Thread }) {
 
           {/* children (1-level) */}
           {(childrenMap[c._id] || []).map((kid) => (
-            <div key={kid._id} style={{ marginTop: 8, marginLeft: 8 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "24px 1fr", gap: 8 }}>
+            <div key={kid._id} className={styles.nestedReply}>
+              <div className={styles.nestedReplyContent}>
                 <Avatar author={kid.author as Author} size={24} />
                 <div>
                   <div style={{ fontWeight: 600 }}>{kid.author?.username || "user"}</div>
-                  <div style={{ marginTop: 2 }}>{kid.body}</div>
+                  <div className={styles.nestedReplyBody}>{kid.body}</div>
                 </div>
               </div>
             </div>
@@ -192,46 +200,45 @@ export default function ThreadCard({ t }: { t: Thread }) {
   };
 
   return (
-    <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12, marginBottom: 8 }}>
+    <div className={styles.threadContainer}>
       {/* header: avatar + username + large bold title */}
-      <div style={{ display: "grid", gridTemplateColumns: "36px 1fr", gap: 10, alignItems: "center" }}>
+      <div className={styles.header}>
         <Avatar author={t.author as Author} size={36} />
-        <div>
-          <div style={{ fontWeight: 700 }}>{t.author?.username || "user"}</div>
-          <div style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.15, marginTop: 2 }}>{t.title}</div>
+        <div className={styles.headerInfo}>
+          <h2>{t.author?.username || "user"}</h2>
+          <div className={styles.title}>{t.title}</div>
         </div>
       </div>
 
-      {t.body && <div style={{ marginTop: 10, color: "#222" }}>{t.body}</div>}
+      {t.body && <div className={styles.body}>{t.body}</div>}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
-        <button onClick={() => onVoteThread(true)}>▲ {counts.up}</button>
-        <span style={{ minWidth: 24, textAlign: "center" }}>{net}</span>
-        <button onClick={() => onVoteThread(false)}>▼ {counts.down}</button>
-        <span style={{ marginLeft: 8, color: "#666" }}>
-          stance: {t.stance} · RS: {Number(t.reliabilityScore || 0).toFixed(2)}
+      <div className={styles.controls}>
+        <button className={styles.voteButton} onClick={() => onVoteThread(true)}>▲ {counts.up}</button>
+        <span className={styles.voteCount}>{net}</span>
+        <button className={styles.voteButton} onClick={() => onVoteThread(false)}>▼ {counts.down}</button>
+        <span className={styles.meta}>
+          stance: <strong>{t.stance}</strong> · RS: <strong>{Number(t.reliabilityScore || 0).toFixed(2)}</strong>
         </span>
-        <button onClick={() => setOpen((v) => !v)} style={{ marginLeft: "auto" }}>
-          {open ? "Hide" : "Comments"}
+        <button className={styles.commentsButton} onClick={() => setOpen((v) => !v)}>
+          {open ? "Hide Comments" : "View Comments"}
         </button>
       </div>
 
       {open && (
-        <div style={{ marginTop: 10 }}>
+        <div className={styles.commentsSection}>
           {/* new top-level comment */}
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className={styles.newCommentForm}>
             <input
               placeholder="Write a comment..."
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              style={{ flex: 1 }}
             />
             <button onClick={onAdd} disabled={!body.trim()}>
               Post
             </button>
           </div>
 
-          <div style={{ marginTop: 8 }}>
+          <div className={styles.commentsList}>
             {roots.map((c) => (
               <CommentRow key={c._id} c={c} />
             ))}

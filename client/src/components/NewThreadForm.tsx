@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import styles from "./NewThreadForm.module.css";
 
 function wordCount(s: string) {
   return s.trim().split(/\s+/).filter(Boolean).length;
@@ -29,56 +30,80 @@ export default function NewThreadForm({
   };
 
   return (
-    <div style={{border:"1px dashed #aaa", padding:12, borderRadius:8}}>
-      <h3>New Thread</h3>
+    <div className={styles.container}>
+      <h3 className={styles.title}>✍️ New Thread</h3>
+      
       {!lockedSymbol && (
-        <input
-          placeholder="Symbol"
-          value={symbol}
-          onChange={e=>setSymbol(e.target.value.toUpperCase())}
-        />
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Symbol</label>
+          <input
+            className={`${styles.input} ${styles.symbolInput}`}
+            placeholder="Enter stock symbol (e.g., AAPL)"
+            value={symbol}
+            onChange={e=>setSymbol(e.target.value.toUpperCase())}
+          />
+        </div>
       )}
-      {lockedSymbol && <div><b>{lockedSymbol}</b></div>}
+      
+      {lockedSymbol && (
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Symbol</label>
+          <div className={styles.symbolDisplay}>{lockedSymbol}</div>
+        </div>
+      )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
-        <input
-          placeholder="Title (max 300 words)"
-          value={title}
-          onChange={e=>setTitle(e.target.value)}
-          style={{ flex: 1 }}
-        />
-        <span style={{ fontSize: 12, color: overLimit ? "#b91c1c" : "#666" }}>
-          {titleWords}/300
-        </span>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Title (max 300 words)</label>
+        <div className={styles.titleGroup}>
+          <input
+            className={`${styles.input} ${styles.titleInput}`}
+            placeholder="What's your insight?"
+            value={title}
+            onChange={e=>setTitle(e.target.value)}
+          />
+          <span className={`${styles.wordCount} ${overLimit ? styles.over : ""}`}>
+            {titleWords}/300
+          </span>
+        </div>
       </div>
 
-      <select value={stance} onChange={e=>setStance(e.target.value as any)} style={{marginTop:8}}>
-        <option value="buy">buy</option>
-        <option value="sell">sell</option>
-        <option value="neutral">neutral</option>
-      </select>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Stance</label>
+        <select 
+          className={styles.select}
+          value={stance} 
+          onChange={e=>setStance(e.target.value as any)}
+        >
+          <option value="buy">🟢 Buy</option>
+          <option value="sell">🔴 Sell</option>
+          <option value="neutral">⚪ Neutral</option>
+        </select>
+      </div>
 
-      <div style={{marginTop:8}}>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Your Reasoning</label>
         <textarea
-          placeholder="Body (your reasoning)"
+          className={styles.textarea}
+          placeholder="Explain your perspective and reasoning..."
           value={body}
           onChange={e=>setBody(e.target.value)}
-          rows={3}
-          style={{width:"100%"}}
         />
       </div>
 
-      <button
-        onClick={submit}
-        style={{marginTop:8}}
-        disabled={!symbol || !title.trim() || !body.trim() || overLimit}
-        title={overLimit ? "Title exceeds 300-word limit" : ""}
-      >
-        Create
-      </button>
+      <div className={styles.buttonGroup}>
+        <button
+          className={styles.submitButton}
+          onClick={submit}
+          disabled={!symbol || !title.trim() || !body.trim() || overLimit}
+          title={overLimit ? "Title exceeds 300-word limit" : ""}
+        >
+          Create Thread
+        </button>
+      </div>
+
       {overLimit && (
-        <div style={{ color: "#b91c1c", marginTop: 6, fontSize: 12 }}>
-          Title is over 300 words. Please shorten it.
+        <div className={styles.errorMessage}>
+          ⚠️ Title is over 300 words. Please shorten it.
         </div>
       )}
     </div>
