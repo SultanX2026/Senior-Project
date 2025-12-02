@@ -78,7 +78,7 @@ def ask_chatbot():
     context = "\n".join(context_parts)
     
     # Generate response
-    prompt = f"{context}\n\nUser question: {question}\n\nProvide a concise answer (2-3 sentences max). Do not give financial advice."
+    prompt = f"{context}\n\nUser question: {question}\n\nProvide a concise answer (2-3 sentences max). Do not include disclaimers or statements about not being a financial advisor."
     
     # Try Ollama first (free, local), then fall back to OpenAI
     logger.info(f"Trying to generate response for question: {question}")

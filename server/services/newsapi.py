@@ -72,12 +72,13 @@ def headlines_for_symbol_finnhub(symbol: str, page_size: int = 10):
 def headlines_for_symbol_newsapi(symbol: str, page_size: int = 10):
     """
     Fallback: Fetch from NewsAPI with domain filtering for quality financial news.
+    Prioritizes articles with symbol in title/description, then fills with general domain-whitelisted articles.
     """
     try:
         params = {
             "q": symbol,
             "sortBy": "publishedAt",
-            "pageSize": page_size * 3,   # get extra, we'll filter down
+            "pageSize": page_size * 5,   # get extra, we'll filter down
             "language": "en",
             "apiKey": Config.NEWSAPI_KEY,
             "domains": ",".join(DOMAIN_WHITELIST),
@@ -87,20 +88,37 @@ def headlines_for_symbol_newsapi(symbol: str, page_size: int = 10):
         data = r.json()
 
         raw = data.get("articles", []) or []
-        whitelisted = []
+        symbol_matched = []  # Articles with symbol in title/description
+        domain_matched = []  # Articles from whitelisted domains only
+        symbol_lower = symbol.lower()
+        
         for a in raw:
             url = a.get("url") or ""
-            if _host(url) in DOMAIN_WHITELIST:
-                whitelisted.append({
-                    "title": a.get("title"),
-                    "source": (a.get("source") or {}).get("name"),
-                    "url": url,
-                    "urlToImage": a.get("urlToImage"),
-                    "publishedAt": a.get("publishedAt"),
-                    "description": a.get("description"),
-                })
-        # Trim to requested size after filtering
-        return whitelisted[:page_size]
+            title = a.get("title") or ""
+            description = a.get("description") or ""
+            
+            # Check if URL is from whitelisted domain
+            if _host(url) not in DOMAIN_WHITELIST:
+                continue
+            
+            article = {
+                "title": title,
+                "source": (a.get("source") or {}).get("name"),
+                "url": url,
+                "urlToImage": a.get("urlToImage"),
+                "publishedAt": a.get("publishedAt"),
+                "description": description,
+            }
+            
+            # Check if symbol appears in title or description
+            if symbol_lower in title.lower() or symbol_lower in description.lower():
+                symbol_matched.append(article)
+            else:
+                domain_matched.append(article)
+        
+        # Combine: prioritize symbol-matched articles, then fill with domain-matched
+        result = symbol_matched + domain_matched
+        return result[:page_size]
     except Exception as e:
         print(f"NewsAPI fetch failed: {e}")
         return []

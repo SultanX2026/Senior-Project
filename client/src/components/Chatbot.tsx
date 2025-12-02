@@ -52,6 +52,23 @@ export default function Chatbot() {
     }
   };
 
+  const exportChatHistory = () => {
+    const timestamp = new Date().toLocaleString();
+    const chatText = messages
+      .map(msg => `${msg.role.toUpperCase()}: ${msg.text}`)
+      .join("\n\n");
+    
+    const content = `Chat History - Exported ${timestamp}\n${"=".repeat(50)}\n\n${chatText}`;
+    
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `chat-history-${Date.now()}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 9999 }}>
       {/* Chat Button */}
@@ -102,18 +119,37 @@ export default function Chatbot() {
             }}
           >
             <span style={{ fontWeight: "bold" }}>Stock Advisor 📈</span>
-            <button
-              onClick={() => setIsOpen(false)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "white",
-                fontSize: 18,
-                cursor: "pointer",
-              }}
-            >
-              ✕
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={exportChatHistory}
+                title="Export chat history"
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "white",
+                  fontSize: 18,
+                  cursor: "pointer",
+                  opacity: 0.8,
+                  transition: "opacity 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
+              >
+                ⬇️
+              </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "white",
+                  fontSize: 18,
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
