@@ -332,14 +332,6 @@ export default function Stock() {
             </div>
             <div className={styles.metricsGrid}>
               <div className={styles.metric}>
-                <span className={styles.label}>Market Cap</span>
-                <span className={styles.value}>
-                  {metrics?.marketCapitalization
-                    ? `$${(metrics.marketCapitalization / 1_000_000_000).toFixed(2)}B`
-                    : "—"}
-                </span>
-              </div>
-              <div className={styles.metric}>
                 <span className={styles.label}>52W High</span>
                 <span className={styles.value}>
                   ${metrics?.["52WeekHigh"]?.toFixed(2) || "—"}
@@ -361,12 +353,6 @@ export default function Stock() {
                 <span className={styles.label}>EPS (TTM)</span>
                 <span className={styles.value}>
                   ${metrics?.epsBasicExclExtraItemsTTM?.toFixed(2) || "—"}
-                </span>
-              </div>
-              <div className={styles.metric}>
-                <span className={styles.label}>Revenue (TTM)</span>
-                <span className={styles.value}>
-                  ${(metrics?.revenueTTM / 1_000_000_000)?.toFixed(2) || "—"}B
                 </span>
               </div>
             </div>

@@ -48,8 +48,15 @@ export default function ThreadCard({ t }: { t: Thread }) {
   const [body, setBody] = useState("");
   const [replyFor, setReplyFor] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [counts, setCounts] = useState({ up: t.up || 0, down: t.down || 0 });
+  const [threadData, setThreadData] = useState(t);
+  const [counts, setCounts] = useState({ up: threadData.up || 0, down: threadData.down || 0 });
   const [theme, setTheme] = useState<"dark" | "light">(getTheme());
+
+  // Update thread data when parent passes new thread
+  useEffect(() => {
+    setThreadData(t);
+    setCounts({ up: t.up || 0, down: t.down || 0 });
+  }, [t]);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -61,22 +68,32 @@ export default function ThreadCard({ t }: { t: Thread }) {
   }, []);
 
   const load = async () => {
-    const res = await listComments(t._id);
+    const res = await listComments(threadData._id);
     setRows(res.comments ?? []);
   };
+  
+  const reloadThreadData = async () => {
+    // Re-fetch the thread from parent via a callback, or just reload comments which will sync state
+    await load();
+  };
+  
   useEffect(() => {
     if (open) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, threadData._id]);
 
   const net = counts.up - counts.down;
 
   const onVoteThread = async (upvote: boolean) => {
-    const updated = await vote("thread", t._id, upvote);
+    const updated = await vote("thread", threadData._id, upvote);
     // narrow: thread updates will include up/down
     if (updated && typeof updated === "object" && "up" in updated && "down" in updated) {
-      setCounts({ up: (updated as Thread).up || 0, down: (updated as Thread).down || 0 });
+      const newCounts = { up: (updated as Thread).up || 0, down: (updated as Thread).down || 0 };
+      setCounts(newCounts);
+      setThreadData(prev => ({ ...prev, ...(updated as Thread) }));
     }
+    // Reload comments to keep everything in sync
+    if (open) await load();
   };
 
   const postComment = async (text: string, parentId?: string | null) => {
@@ -144,6 +161,8 @@ export default function ThreadCard({ t }: { t: Thread }) {
           down: (updated as Comment).down || 0,
         });
       }
+      // Reload comments to ensure thread vote counts are fresh
+      await load();
     };
 
     return (
@@ -203,21 +222,21 @@ export default function ThreadCard({ t }: { t: Thread }) {
     <div className={styles.threadContainer}>
       {/* header: avatar + username + large bold title */}
       <div className={styles.header}>
-        <Avatar author={t.author as Author} size={36} />
+        <Avatar author={threadData.author as Author} size={36} />
         <div className={styles.headerInfo}>
-          <h2>{t.author?.username || "user"}</h2>
-          <div className={styles.title}>{t.title}</div>
+          <h2>{threadData.author?.username || "user"}</h2>
+          <div className={styles.title}>{threadData.title}</div>
         </div>
       </div>
 
-      {t.body && <div className={styles.body}>{t.body}</div>}
+      {threadData.body && <div className={styles.body}>{threadData.body}</div>}
 
       <div className={styles.controls}>
         <button className={styles.voteButton} onClick={() => onVoteThread(true)}>▲ {counts.up}</button>
         <span className={styles.voteCount}>{net}</span>
         <button className={styles.voteButton} onClick={() => onVoteThread(false)}>▼ {counts.down}</button>
         <span className={styles.meta}>
-          stance: <strong>{t.stance}</strong> · RS: <strong>{Number(t.reliabilityScore || 0).toFixed(2)}</strong>
+          stance: <strong>{threadData.stance}</strong> · RS: <strong>{Number(threadData.reliabilityScore || 0).toFixed(2)}</strong>
         </span>
         <button className={styles.commentsButton} onClick={() => setOpen((v) => !v)}>
           {open ? "Hide Comments" : "View Comments"}

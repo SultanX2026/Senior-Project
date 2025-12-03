@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import { sendMessageToAgent } from "../api/aws";
 
 type Message = { role: "user" | "bot"; text: string };
 
@@ -11,6 +11,9 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Create unique session ID for this chatbot instance
+  const sessionIdRef = useRef(`chat-${Date.now()}-${Math.random().toString(36).substring(7)}`);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,13 +32,7 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/chatbot/ask`,
-        { question: userMsg },
-        { timeout: 15000 }
-      );
-      
-      const botReply = res.data.answer || "Sorry, I couldn't generate a response.";
+      const botReply = await sendMessageToAgent(userMsg, sessionIdRef.current);
       setMessages(prev => [...prev, { role: "bot", text: botReply }]);
     } catch (err) {
       console.error("Chatbot error:", err);
