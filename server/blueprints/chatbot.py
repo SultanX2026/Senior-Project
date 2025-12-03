@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.ollama_client import generate_with_ollama
-from services.llm_fallback import generate_with_openai
+from services.llm_fallback import generate_with_agent
 from core.db import threads, comments
 from core.config import Config
 import logging
@@ -80,9 +80,19 @@ def ask_chatbot():
     # Generate response
     prompt = f"{context}\n\nUser question: {question}\n\nProvide a concise answer (2-3 sentences max). Do not include disclaimers or statements about not being a financial advisor."
     
-    # Try Ollama first (free, local), then fall back to OpenAI
+    # Try Agent API first (primary), then Ollama
     logger.info(f"Trying to generate response for question: {question}")
     
+    answer = generate_with_agent(prompt, session_id=f"user-{request.remote_addr}")
+    if answer:
+        logger.info("✓ Agent API response generated")
+        return jsonify({
+            "question": question,
+            "answer": answer,
+            "symbols_mentioned": symbols
+        })
+    
+    logger.warning("⚠ Agent API failed, trying Ollama...")
     answer = generate_with_ollama(prompt)
     if answer:
         logger.info("✓ Ollama response generated")
@@ -92,20 +102,10 @@ def ask_chatbot():
             "symbols_mentioned": symbols
         })
     
-    logger.warning("⚠ Ollama failed, trying OpenAI...")
-    answer = generate_with_openai(prompt)
-    if answer:
-        logger.info("✓ OpenAI response generated")
-        return jsonify({
-            "question": question,
-            "answer": answer,
-            "symbols_mentioned": symbols
-        })
-    
-    logger.error("✗ Both Ollama and OpenAI failed!")
+    logger.error("✗ All services failed (Agent API and Ollama)!")
     return jsonify({
         "question": question,
         "answer": "I couldn't generate a response. Try again.",
         "symbols_mentioned": symbols,
-        "error": "Both Ollama and OpenAI services failed"
+        "error": "All chatbot services unavailable"
     })
