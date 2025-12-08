@@ -3,16 +3,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+  background: var(--bg-primary);
   padding: 20px;
 }
 
 .card {
-  background: #1a1a2e;
-  border: 1px solid #2d2d44;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   width: 100%;
   max-width: 420px;
 }
@@ -33,7 +33,7 @@
 }
 
 .subtitle {
-  color: #a0a0c0;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
@@ -52,7 +52,7 @@
 
 .label {
   font-size: 13px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
@@ -60,10 +60,10 @@
 
 .input {
   padding: 12px 16px;
-  background: #252541;
-  border: 1px solid #2d2d44;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 14px;
   transition: all 0.3s;
 }
@@ -141,10 +141,10 @@
 .input,
 .select {
   padding: 12px 16px;
-  background: #252541;
-  border: 1px solid #2d2d44;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 14px;
   font-family: inherit;
   transition: all 0.3s;
@@ -159,8 +159,8 @@
 }
 
 .select option {
-  background: #1a1a2e;
-  color: #ffffff;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 8px 16px;
 }
 
@@ -169,7 +169,7 @@
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: #1f1f35;
+  background: var(--bg-tertiary);
 }
 
 .select:focus {
@@ -185,7 +185,7 @@
 }
 
 .stepInfo {
-  color: #a0a0c0;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
   text-align: center;
@@ -193,7 +193,7 @@
 
 .footerText {
   text-align: center;
-  color: #a0a0c0;
+  color: var(--text-secondary);
   font-size: 13px;
   margin: 10px 0 0 0;
 }

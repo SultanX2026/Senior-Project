@@ -20,7 +20,7 @@
 }
 
 .subtitle {
-  color: #a0a0c0;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
@@ -37,10 +37,10 @@
   flex: 1;
   min-width: 200px;
   padding: 10px 16px;
-  background: #1a1a2e;
-  border: 1px solid #2d2d44;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 14px;
   transition: all 0.3s;
 }
@@ -98,8 +98,8 @@
 }
 
 .summaryCard {
-  background: #1a1a2e;
-  border: 1px solid #2d2d44;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 30px;
@@ -116,11 +116,11 @@
 .summaryContent {
   white-space: pre-wrap;
   word-wrap: break-word;
-  color: #a0a0c0;
-  background: #252541;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
   padding: 16px;
   border-radius: 8px;
-  border: 1px solid #2d2d44;
+  border: 1px solid var(--border-color);
   margin: 0;
   font-size: 13px;
   line-height: 1.6;
@@ -137,7 +137,7 @@
 .empty {
   text-align: center;
   padding: 60px 20px;
-  color: #a0a0c0;
+  color: var(--text-secondary);
 }
 
 .empty p {
