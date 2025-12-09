@@ -2,39 +2,6 @@
 
 A full-stack stock market community platform with real-time data, AI-powered analysis, intelligent chatbot, and community discussions.
 
-## 🌟 Features
-
-### Stock Analysis
-- 📈 Real-time stock quotes and price charts (1D, 5D, 1M, 1Y views)
-- 📊 Stock metrics: 52-week high/low, P/E ratio, EPS (TTM)
-- 🏢 Company information and profiles
-- 📰 Intelligent news aggregation with symbol filtering
-- 🌙 Light/Dark mode with persistent theme preference
-
-### Community
-- 💬 Create and discuss stock threads with stance (Buy/Sell/Neutral)
-- 👍 Vote on threads and comments (up/down voting)
-- ↩️ Reply to comments (1-level nested replies)
-- 📊 Community sentiment analysis per stock
-- ⭐ Reliability scoring based on community votes
-
-### Intelligent Chatbot
-- 🤖 AWS Lambda powered agent API for stock insights
-- 💭 Multi-turn conversation with session persistence
-- 📥 Export chat history as text file
-- 🔄 Automatic fallback chain: Agent API → OpenAI → Ollama
-
-### Authentication & Security
-- 🔐 User registration and login with JWT tokens
-- 🔑 Password recovery with security questions
-- 👤 Profile management and theme preferences
-- 🎨 Avatar color customization
-
-### User Experience
-- 🌗 Automatic theme detection and persistence
-- 🎯 Responsive design (mobile-friendly)
-- ⚡ Real-time UI updates
-- 🎨 Smooth transitions and animations
 
 ## Prerequisites
 
@@ -204,21 +171,6 @@ Calculated per thread: `(upvotes - downvotes) / (upvotes + downvotes + 5)`
 
 ## Troubleshooting
 
-### Port already in use?
-Change ports in `docker-compose.yml`:
-```yaml
-ports:
-  - "5173:5173"  # Change left number for frontend
-  - "5001:5001"  # Change left number for backend
-```
-
-### MongoDB connection failed
-Ensure MongoDB container is running:
-```bash
-docker compose ps
-docker compose logs mongo
-```
-
 ### API key errors
 1. Verify all required API keys in `.env`
 2. Check key permissions and rate limits
@@ -239,42 +191,3 @@ rm -rf client/node_modules
 docker compose up --build
 ```
 
-## Performance Tips
-
-- News filtering optimizes query size (fetches 3x, filters down)
-- Comments use 1-level nesting to keep structure simple
-- Chart data limited to 180 periods per view
-- Theme CSS uses variables for instant updates
-- Session IDs ensure chatbot context isolation
-
-## Testing
-
-### Manual testing checklist
-- [ ] Create account and login
-- [ ] Toggle theme (light/dark) and verify persistence
-- [ ] Search and view stock (verify chart loads)
-- [ ] Create community thread with stance
-- [ ] Vote on thread/comment (verify toggle)
-- [ ] Chat with agent about a stock
-- [ ] Export chat history
-- [ ] Logout and verify theme persists on login
-
-## Contributing
-
-1. Create feature branch: `git checkout -b feature/your-feature`
-2. Commit changes: `git commit -m "Add feature"`
-3. Push to origin: `git push origin feature/your-feature`
-4. Open pull request to `main` branch
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Support
-
-For issues and feature requests, please open a GitHub issue or contact the development team.
-
----
-
-**Last Updated**: December 5, 2025
-**Current Version**: 1.0.0
