@@ -32,8 +32,13 @@ export type Metrics = { ok: boolean; metric?: Record<string, unknown>; };
 async function safeGet<T>(url: string, params: any = {}): Promise<T | null> {
   try {
     const res = await client.get(url, { params });
+    if (!res.data) {
+      console.warn(`[API] No data returned from ${url}`, params);
+      return null;
+    }
     return (res.data as T) ?? null;
-  } catch {
+  } catch (err) {
+    console.error(`[API] Error fetching ${url}:`, err);
     return null;
   }
 }

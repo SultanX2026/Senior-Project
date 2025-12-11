@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
+import logging
 
 from core.config import Config
 from blueprints.auth import auth_bp
@@ -10,19 +11,36 @@ from blueprints.rankings import rank_bp
 from blueprints.news import news_bp
 from blueprints.chatbot import chatbot_bp
 
+# Setup logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 def create_app() -> Flask:
     app = Flask(__name__)
 
-    # Keep JSON as-is (don’t alphabetize keys)
+    # Keep JSON as-is (don't alphabetize keys)
     app.config["JSON_SORT_KEYS"] = False
 
+    # Log all requests
+    @app.before_request
+    def log_request():
+        logger.info(f"[REQUEST] {request.method} {request.path} from {request.remote_addr}")
+
     # CORS for all /api/* routes
-    CORS(
-        app,
-        resources={r"/api/*": {"origins": Config.ALLOW_ORIGINS}},
-        supports_credentials=False,
-    )
+    cors_origins = Config.ALLOW_ORIGINS
+    if cors_origins == "*":
+        # Allow all origins in development
+        CORS(app, resources={r"/api/*": {"origins": "*"}})
+    else:
+        # Restrict to specific origins in production
+        CORS(
+            app,
+            resources={r"/api/*": {"origins": cors_origins}},
+            supports_credentials=False,
+        )
+    
+    print(f"[CORS] Allowed origins: {cors_origins}")
 
     # Register blueprints
     app.register_blueprint(auth_bp)

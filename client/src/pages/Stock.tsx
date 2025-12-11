@@ -65,16 +65,43 @@ export default function Stock() {
   useEffect(() => {
     (async () => {
       try {
-        const [q, prof, metr, c] = await Promise.all([
+        console.log(`[Stock] Fetching data for ${symbol}`);
+        const promises = [
           getQuote(symbol),
           getProfile(symbol),
           getMetrics(symbol),
           communitySentiment(symbol).catch(() => null),
-        ]);
-        if (q && q.ok !== false) setQuote(q);
-        if (prof && prof.ok !== false) setProfile(prof);
-        if (metr && metr.metric) setMetrics(metr.metric);
-        if (c) setComm(c);
+        ];
+        console.log("[Stock] Promises created, awaiting...");
+        
+        const [q, prof, metr, c] = await Promise.all(promises);
+        
+        console.log("[Stock] Quote response:", q);
+        console.log("[Stock] Profile response:", prof);
+        console.log("[Stock] Metrics response:", metr);
+        console.log("[Stock] Community response:", c);
+        
+        if (q && q.ok !== false) {
+          console.log("[Stock] Setting quote");
+          setQuote(q);
+        } else {
+          console.warn("[Stock] Quote response not ok:", q);
+        }
+        
+        if (prof && prof.ok !== false) {
+          console.log("[Stock] Setting profile");
+          setProfile(prof);
+        }
+        
+        if (metr && metr.metric) {
+          console.log("[Stock] Setting metrics");
+          setMetrics(metr.metric);
+        }
+        
+        if (c) {
+          console.log("[Stock] Setting community");
+          setComm(c);
+        }
       } catch (e) {
         console.error("Error fetching stock data:", e);
       }
@@ -161,6 +188,9 @@ export default function Stock() {
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+              duration: 0, // Disable animations to prevent continuous redraw
+            },
             plugins: {
               legend: { display: false },
               tooltip: {
