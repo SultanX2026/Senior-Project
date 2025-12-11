@@ -9,6 +9,14 @@ try:
 except Exception:
     ZoneInfo = None
 
+# Import Yahoo Finance fallback
+from services.yahoo_finance import (
+    get_quote_yahoo,
+    get_profile_yahoo,
+    get_metrics_yahoo,
+    get_candles_yahoo,
+)
+
 stocks_bp = Blueprint("stocks", __name__, url_prefix="/api/stocks")
 
 
@@ -213,6 +221,14 @@ def quote():
         data = _get("/quote", {"symbol": symbol})
         return jsonify({"ok": True, **(data or {})})
     except (requests.HTTPError, requests.RequestException, RetryError) as e:
+        # Fallback to Yahoo Finance
+        try:
+            data = get_quote_yahoo(symbol)
+            if data:
+                return jsonify(data)
+        except Exception as yahoo_err:
+            print(f"[FALLBACK] Yahoo Finance quote also failed: {yahoo_err}")
+        
         if DEMO_MODE:
             return jsonify({
                 "ok": True, "c": 258.06, "d": 1.58, "dp": 0.616,
@@ -402,6 +418,14 @@ def profile():
         data = _get("/stock/profile2", {"symbol": symbol})
         return jsonify({"ok": True, **(data or {})})
     except (requests.HTTPError, requests.RequestException, RetryError) as e:
+        # Fallback to Yahoo Finance
+        try:
+            data = get_profile_yahoo(symbol)
+            if data:
+                return jsonify(data)
+        except Exception as yahoo_err:
+            print(f"[FALLBACK] Yahoo Finance profile also failed: {yahoo_err}")
+        
         if DEMO_MODE:
             return jsonify({"ok": True, "ticker": symbol, "name": "Demo Inc", "exchange": "DEMO", "currency": "USD"})
         code = getattr(getattr(e, "response", None), "status_code", 502) or 502
@@ -423,6 +447,14 @@ def metrics():
         data = _get("/stock/metric", {"symbol": symbol, "metric": "all"})
         return jsonify({"ok": True, **(data or {})})
     except (requests.HTTPError, requests.RequestException, RetryError) as e:
+        # Fallback to Yahoo Finance
+        try:
+            data = get_metrics_yahoo(symbol)
+            if data:
+                return jsonify(data)
+        except Exception as yahoo_err:
+            print(f"[FALLBACK] Yahoo Finance metrics also failed: {yahoo_err}")
+        
         if DEMO_MODE:
             return jsonify({"ok": True, "metric": {"marketCapitalization": 0.0, "peBasicExclExtraTTM": 38.5}})
         code = getattr(getattr(e, "response", None), "status_code", 502) or 502

@@ -88,6 +88,7 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
+  min-width: 0;
 }
 
 .section {
@@ -196,6 +197,9 @@
   height: 300px;
   position: relative;
   background: transparent;
+  display: block;
+  overflow: hidden;
+  width: 100%;
 }
 
 .chartContainer canvas {
@@ -390,10 +394,28 @@
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .leftPanel, .rightPanel {
+    width: 100%;
+  }
+
   .header {
     flex-direction: column;
     gap: 16px;
     text-align: center;
+    padding: 16px;
+  }
+
+  .logo h1 {
+    font-size: 24px;
   }
   
   .headerInfo {
@@ -405,5 +427,163 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+  }
+
+  .stockSymbol {
+    font-size: 24px !important;
+  }
+
+  .stockPrice {
+    align-items: flex-start;
+  }
+
+  .stockPrice span:first-child {
+    font-size: 24px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .chartContainer {
+    height: 300px;
+  }
+
+  .timeRange {
+    flex-direction: row;
+  }
+
+  .rangeBtn {
+    flex: 1;
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  .communityBtn {
+    min-height: 44px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .metricsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .newsContainer {
+    gap: 12px;
+  }
+
+  .newsItem {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+
+  .header {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .logo h1 {
+    font-size: 18px;
+  }
+
+  .logoIcon {
+    font-size: 24px;
+  }
+
+  .marketStatus {
+    font-size: 12px;
+  }
+
+  .lastUpdate {
+    font-size: 12px;
+  }
+
+  .stockSymbol {
+    font-size: 20px !important;
+  }
+
+  .stockPrice span:first-child {
+    font-size: 20px;
+  }
+
+  .sectionHeader h2 {
+    font-size: 18px;
+  }
+
+  .section {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .chartContainer {
+    height: 250px;
+  }
+
+  .timeRange {
+    gap: 6px;
+  }
+
+  .rangeBtn {
+    min-height: 40px;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .stockDetails {
+    font-size: 13px;
+  }
+
+  .stockDetails div {
+    padding: 8px 0;
+  }
+
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .metric {
+    padding: 12px;
+  }
+
+  .communityBtn {
+    min-height: 44px;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .companyInfo {
+    gap: 12px;
+  }
+
+  .companyName {
+    font-size: 18px;
+  }
+
+  .companyDetails {
+    font-size: 13px;
+  }
+
+  .newsItem {
+    padding: 12px;
+  }
+
+  .newsTitle {
+    font-size: 14px;
+  }
+
+  .newsDescription {
+    font-size: 12px;
+  }
+
+  .newsMeta {
+    font-size: 11px;
   }
 }
